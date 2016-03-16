@@ -1,0 +1,82 @@
+{
+   for qa/459
+   Memcheck:Leak
+   fun:malloc
+   fun:__pmLogFetchInterp
+   fun:__pmLogFetch
+   fun:pmFetch
+}
+
+{
+    vm04: for qa/400, qa/731 and qa/957
+    Memcheck:Leak
+    fun:malloc
+    fun:load
+    fun:pmGetPMNSLocation
+    fun:GetLocation
+    fun:TraversePMNS
+}
+
+# A group of failures below dlopen() on vm24 for qa/720
+# There are several call paths, this is typical ...
+# at 0x4A05140: calloc (vg_replace_malloc.c:418)
+# by 0x3FFF60E865: _dl_check_map_versions (in /lib64/ld-2.5.so)
+# by 0x3FFF610F88: dl_open_worker (in /lib64/ld-2.5.so)
+# by 0x3FFF60CED5: _dl_catch_error (in /lib64/ld-2.5.so)
+# by 0x3FFF61068B: _dl_open (in /lib64/ld-2.5.so)
+# by 0x3FFFE00F99: dlopen_doit (in /lib64/libdl-2.5.so)
+# by 0x3FFF60CED5: _dl_catch_error (in /lib64/ld-2.5.so)
+# by 0x3FFFE0150C: _dlerror_run (in /lib64/libdl-2.5.so)
+# by 0x3FFFE00F10: dlopen@@GLIBC_2.2.5 (in /lib64/libdl-2.5.so)
+# by 0x3015011FAC: _sasl_get_plugin (in /usr/lib64/libsasl2.so.2.0.22)
+# by 0x3015012452: _sasl_load_plugins (in /usr/lib64/libsasl2.so.2.0.22)
+# by 0x3015008AF1: sasl_client_init (in /usr/lib64/libsasl2.so.2.0.22)
+{
+   vm24: for qa/720
+   Memcheck:Leak
+   fun:calloc
+   ...
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+}
+
+{
+   vm24: for qa/720
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+}
+
+# from vm25 and qa/957
+#    at 0x4A0610C: malloc (vg_replace_malloc.c:195)
+#    by 0x4C440CD: loadascii (pmns.c:1149)
+#    by 0x4C44755: load (pmns.c:1371)
+#    by 0x4C41A0D: LoadDefault (pmns.c:176)
+#    by 0x4C41C3E: pmGetPMNSLocation (pmns.c:240)
+#    by 0x4C41E3E: GetLocation (pmns.c:304)
+#    by 0x4C47908: TraversePMNS (pmns.c:2575)
+#    by 0x4C47CE5: pmTraversePMNS (pmns.c:2683)
+#    by 0x402E31: main (pminfo.c:677)
+{
+   loadascii
+   Memcheck:Leak
+   fun:malloc
+   fun:loadascii
+   fun:load
+   fun:LoadDefault
+   fun:pmGetPMNSLocation
+   fun:GetLocation
+   fun:TraversePMNS
+   fun:pmTraversePMNS
+   fun:main
+}

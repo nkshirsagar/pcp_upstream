@@ -1,0 +1,111 @@
+#! /bin/sh
+# PCP QA Test No. 798
+# Exercise dbpmda use with the Perl implementation of nfsclient
+#
+# Copyright (c) 2013 Red Hat.
+#
+
+seq=`basename $0`
+echo "QA output created by $seq"
+
+# get standard filters
+. ./common.product
+. ./common.filter
+. ./common.check
+
+[ -d $PCP_PMDAS_DIR/nfsclient ] || _notrun "nfsclient PMDA directory is not installed"
+
+status=1
+perl -e "use PCP::PMDA" >/dev/null 2>&1
+[ $? -eq 0 ] || _notrun "perl PCP::PMDA module not installed"
+
+_cleanup()
+{
+    $sudo rm -f $here/nfsclient.log
+    rm -f $tmp.*
+}
+
+trap "_cleanup; exit \$status" 0 1 2 3 15
+
+_filter()
+{
+    sed \
+	-e "s;$PCP_PMDAS_DIR;\$PCP_PMDAS_DIR;" \
+	-e "s;$script;pmdanfsclient.pl;" \
+    | _filter_dumpresult
+}
+
+_filter_pmda_log()
+{
+    sed \
+	-e 's/^\(Log for pmda[^ ]* on\) .*/\1 HOST .../' \
+	-e 's/^\(Log finished\) .*/\1 .../' \
+	-e '/^$/d' \
+    #end
+}
+
+_filter_indom()
+{
+    # for indom 62.0 the order of the instances (and hence internal
+    # instance number depends on the version of perl and the phase
+    # of the moon ...
+    # pmInDom: 62.0
+    # [  0] inst: 0 name: "/mnt/nfsv4"
+    # [  1] inst: 1 name: "/mnt/nfs41"
+    # [  2] inst: 2 name: "/ifs"
+    # [  3] inst: 3 name: "/ifsfoo"
+    # dbpmda> 
+    #
+    rm -f $tmp.1 $tmp.2 $tmp.3
+    $PCP_AWK_PROG '
+BEGIN						{ part = 1 }
+part == 2 && $1 == "dbpmda>"			{ part = 3 }
+						{ outname = "'$tmp'." part; print >outname }
+part == 1 && $1 == "pmInDom:" && $2 == "62.0"	{ part = 2 }'
+
+    [ -f $tmp.1 ] && cat $tmp.1
+    [ -f $tmp.2 ] && LC_COLLATE=posix sort --key 6 $tmp.2 \
+    | $PCP_AWK_PROG '
+NR == 1	{ printf "[  X] inst: X name: %s\n",$6 }
+NR > 1	{ printf "[X+%d] inst: X+%d name: %s\n", NR-1, NR-1, $6 }'
+    [ -f $tmp.3 ] && cat $tmp.3
+}
+
+# real QA test starts here
+domain=62
+script=pmdanfsclient.pl
+cd "$PCP_PMDAS_DIR/nfsclient"
+
+# create a root namespace file for dbpmda to use
+PCP_PERL_PMNS=root /usr/bin/env perl $script > $tmp.root
+
+# create a set of commands for dbpmda
+cat >$tmp.cmds <<End-of-File
+open pipe /usr/bin/env perl $script
+getdesc on
+desc nfsclient.export
+desc nfsclient.mountpoint
+desc nfsclient.options.string
+desc nfsclient.options.proto
+desc nfsclient.options.vers
+fetch nfsclient.export
+fetch nfsclient.mountpoint
+fetch nfsclient.options.string
+fetch nfsclient.options.proto
+fetch nfsclient.options.vers
+fetch nfsclient.options.vers
+instance $domain.0
+End-of-File
+
+# iterate over our pre-canned mountstats files
+test="$here/nfsclient"
+for file in $test/*.qa
+do
+    export NFSCLIENT_MOUNTSTATS_PATH="$file"
+    echo === Test case: `basename $file`
+    $sudo rm -f nfsclient.log
+    $sudo TERM=ansi sh -c ". /etc/pcp.env; dbpmda -n $tmp.root -ie" < $tmp.cmds 2>&1 | _filter | _filter_indom
+    _filter_pmda_log < nfsclient.log
+done
+
+status=0

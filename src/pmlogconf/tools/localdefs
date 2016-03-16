@@ -1,0 +1,26 @@
+FILES = \
+	atop \
+	atop-proc \
+	atop-summary \
+	atop-httpstats \
+	collectl \
+	collectl-summary \
+	collectl-interrupts \
+	dmcache \
+	free \
+	free-summary \
+	iostat \
+	ip \
+	mpstat \
+	mpstat-interrupts \
+	numastat \
+	pcp-summary \
+	pmclient \
+	pmclient-summary \
+	pmstat \
+	sar \
+	sar-summary \
+	uptime \
+	vmstat \
+	vmstat-summary \
+# END

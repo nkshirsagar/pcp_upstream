@@ -1,0 +1,53 @@
+#!/bin/sh
+# PCP QA Test No. 842
+# Exercise basic pmiostat(1) invocations using an archive.
+#
+# Copyright (c) 2014 Red Hat.
+#
+
+seq=`basename $0`
+echo "QA output created by $seq"
+
+. ./common.python
+status=1	# failure is the default!
+$sudo rm -rf $tmp.* $seq.full
+trap "cd $here; rm -rf $tmp.*; exit \$status" 0 1 2 3 15
+
+PMIOSTAT="$PCP_BIN_DIR/pmiostat"
+test -x $PMIOSTAT || _notrun "No pmiostat(1) installed"
+PMIOSTAT="$python $PMIOSTAT"
+
+# real QA test starts here
+echo 'All devices'
+$PMIOSTAT -z --samples 5 --archive archives/dm-io
+echo
+
+echo 'DM devices'
+$PMIOSTAT -z --samples 3 --archive archives/dm-io -x dm
+echo
+
+echo 'Timestamps and no headers'
+$PMIOSTAT -z --samples 10 --archive archives/dm-io -x t,h
+echo
+
+t=1
+while [ $t -le 30 ]
+do
+    for metric_field in read_merge:7 write_merge:8 read:9 write:10 read_bytes:11 write_bytes:12
+    do
+	metric=$(echo $metric_field | sed -e 's/:.*$//')
+	field=$(echo $metric_field | sed -e 's/^.*://') 
+
+	$PCP_ECHO_PROG $PCP_ECHO_N "Checking pmiostat against pmval -t $t disk.dev.$metric ...""$PCP_ECHO_C"
+	pmval -t $t -a archives/dm-io -f 1 disk.dev.$metric'[sda]' 2>/dev/null |\
+	  sed -e 's/\.[0-9]*//' | awk '/^[0-9][0-9]:/ {print $1, $2}' >$tmp.pmval
+	$PMIOSTAT -t $t -a archives/dm-io -xt,h |\
+	  awk '/^#/ {skip} /sda/ {print $4, $'$field'}' >$tmp.pmiostat
+	if diff -q $tmp.pmval $tmp.pmiostat; then $PCP_ECHO_PROG OK; else $PCP_ECHO_PROG FAILED; fi
+    done
+    t=`expr $t + 1`
+done
+
+# success, all done
+status=0
+exit

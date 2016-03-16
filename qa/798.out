@@ -1,0 +1,135 @@
+QA output created by 798
+=== Test case: mountstats.qa
+dbpmda> open pipe /usr/bin/env perl pmdanfsclient.pl
+Start env PMDA: /usr/bin/env perl pmdanfsclient.pl
+dbpmda> getdesc on
+dbpmda> desc nfsclient.export
+PMID: 62.0.1
+    Data Type: string  InDom: 62.0 0xf800000
+    Semantics: instant  Units: none
+dbpmda> desc nfsclient.mountpoint
+PMID: 62.0.2
+    Data Type: string  InDom: 62.0 0xf800000
+    Semantics: instant  Units: none
+dbpmda> desc nfsclient.options.string
+PMID: 62.1.1
+    Data Type: string  InDom: 62.0 0xf800000
+    Semantics: instant  Units: none
+dbpmda> desc nfsclient.options.proto
+PMID: 62.1.24
+    Data Type: string  InDom: 62.0 0xf800000
+    Semantics: instant  Units: none
+dbpmda> desc nfsclient.options.vers
+PMID: 62.1.6
+    Data Type: string  InDom: 62.0 0xf800000
+    Semantics: instant  Units: none
+dbpmda> fetch nfsclient.export
+PMID(s): 62.0.1
+pmResult ... numpmid: 1
+  62.0.1 (<noname>): numval: 4 valfmt: 1 vlist[]:
+    inst [0 or ???] value STRING
+    inst [1 or ???] value STRING
+    inst [2 or ???] value STRING
+    inst [3 or ???] value STRING
+dbpmda> fetch nfsclient.mountpoint
+PMID(s): 62.0.2
+pmResult ... numpmid: 1
+  62.0.2 (<noname>): numval: 4 valfmt: 1 vlist[]:
+    inst [0 or ???] value STRING
+    inst [1 or ???] value STRING
+    inst [2 or ???] value STRING
+    inst [3 or ???] value STRING
+dbpmda> fetch nfsclient.options.string
+PMID(s): 62.1.1
+pmResult ... numpmid: 1
+  62.1.1 (<noname>): numval: 4 valfmt: 1 vlist[]:
+    inst [0 or ???] value STRING
+    inst [1 or ???] value STRING
+    inst [2 or ???] value STRING
+    inst [3 or ???] value STRING
+dbpmda> fetch nfsclient.options.proto
+PMID(s): 62.1.24
+pmResult ... numpmid: 1
+  62.1.24 (<noname>): numval: 4 valfmt: 1 vlist[]:
+    inst [0 or ???] value STRING
+    inst [1 or ???] value STRING
+    inst [2 or ???] value STRING
+    inst [3 or ???] value STRING
+dbpmda> fetch nfsclient.options.vers
+PMID(s): 62.1.6
+pmResult ... numpmid: 1
+  62.1.6 (<noname>): numval: 4 valfmt: 1 vlist[]:
+    inst [0 or ???] value STRING
+    inst [1 or ???] value STRING
+    inst [2 or ???] value STRING
+    inst [3 or ???] value STRING
+dbpmda> fetch nfsclient.options.vers
+PMID(s): 62.1.6
+pmResult ... numpmid: 1
+  62.1.6 (<noname>): numval: 4 valfmt: 1 vlist[]:
+    inst [0 or ???] value STRING
+    inst [1 or ???] value STRING
+    inst [2 or ???] value STRING
+    inst [3 or ???] value STRING
+dbpmda> instance 62.0
+pmInDom: 62.0
+[  X] inst: X name: "/ifs"
+[X+1] inst: X+1 name: "/ifsfoo"
+[X+2] inst: X+2 name: "/mnt/nfs41"
+[X+3] inst: X+3 name: "/mnt/nfsv4"
+dbpmda> 
+Log for pmdanfsclient on HOST ...
+Log finished ...
+=== Test case: nonfsmounts.qa
+dbpmda> open pipe /usr/bin/env perl pmdanfsclient.pl
+Start env PMDA: /usr/bin/env perl pmdanfsclient.pl
+dbpmda> getdesc on
+dbpmda> desc nfsclient.export
+PMID: 62.0.1
+    Data Type: string  InDom: 62.0 0xf800000
+    Semantics: instant  Units: none
+dbpmda> desc nfsclient.mountpoint
+PMID: 62.0.2
+    Data Type: string  InDom: 62.0 0xf800000
+    Semantics: instant  Units: none
+dbpmda> desc nfsclient.options.string
+PMID: 62.1.1
+    Data Type: string  InDom: 62.0 0xf800000
+    Semantics: instant  Units: none
+dbpmda> desc nfsclient.options.proto
+PMID: 62.1.24
+    Data Type: string  InDom: 62.0 0xf800000
+    Semantics: instant  Units: none
+dbpmda> desc nfsclient.options.vers
+PMID: 62.1.6
+    Data Type: string  InDom: 62.0 0xf800000
+    Semantics: instant  Units: none
+dbpmda> fetch nfsclient.export
+PMID(s): 62.0.1
+pmResult ... numpmid: 1
+  62.0.1 (<noname>): No values returned!
+dbpmda> fetch nfsclient.mountpoint
+PMID(s): 62.0.2
+pmResult ... numpmid: 1
+  62.0.2 (<noname>): No values returned!
+dbpmda> fetch nfsclient.options.string
+PMID(s): 62.1.1
+pmResult ... numpmid: 1
+  62.1.1 (<noname>): No values returned!
+dbpmda> fetch nfsclient.options.proto
+PMID(s): 62.1.24
+pmResult ... numpmid: 1
+  62.1.24 (<noname>): No values returned!
+dbpmda> fetch nfsclient.options.vers
+PMID(s): 62.1.6
+pmResult ... numpmid: 1
+  62.1.6 (<noname>): No values returned!
+dbpmda> fetch nfsclient.options.vers
+PMID(s): 62.1.6
+pmResult ... numpmid: 1
+  62.1.6 (<noname>): No values returned!
+dbpmda> instance 62.0
+pmInDom: 62.0
+dbpmda> 
+Log for pmdanfsclient on HOST ...
+Log finished ...
